@@ -1,0 +1,10 @@
+services:
+  local-rag:
+    image: sualeh/local-rag:latest
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - DOCS_DIRECTORY=/data/docs
+      - VECTOR_DB_PATH=/data/vector_db
+    volumes:
+      - ./docs:/data/docs
+      - ./vector_db:/data/vector_db
