@@ -39,6 +39,15 @@ DOCS_DIRECTORY=path/to/your/documents
 VECTOR_DB_PATH=path/to/save/vector/database
 ```
 
+## Run Locally
+
+Run locally with the following command, with the approproate arguments:
+
+```bash
+poetry run python -m local_rag.main
+```
+
+
 ## Usage
 
 ### Create Vector Database
