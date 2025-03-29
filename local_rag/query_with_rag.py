@@ -50,7 +50,7 @@ def query(vector_db_path=None):
     )
 
     # Create a retriever from the vector database
-    k = 3  # Number of relevant documents to retrieve
+    k = 5  # Number of relevant documents to retrieve
     retriever = vector_db.as_retriever(search_kwargs={"k": k})
 
     # Create the RAG chain
