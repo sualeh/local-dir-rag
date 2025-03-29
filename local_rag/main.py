@@ -7,10 +7,10 @@ from dotenv import load_dotenv
 from local_rag.query_with_rag import query as query_loop
 from local_rag.embed import embed as embed_docs
 
-logger = logging.getLogger(__name__)
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
+logger = logging.getLogger(__name__)
 
 
 def embed(docs_directory: str = None, vector_db_path: str = None):

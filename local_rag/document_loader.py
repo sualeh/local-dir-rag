@@ -74,33 +74,6 @@ def load_document(file_path: str) -> list[Document]:
     return []
 
 
-def load_documents_from_directory(directory_path: str) -> list[Document]:
-    """
-    Load all supported documents from a directory.
-
-    Args:
-        directory_path: Path to the directory containing documents.
-
-    Returns:
-        List of Document objects from all files in the directory.
-    """
-    files = get_files_from_directory(directory_path)
-
-    all_documents = []
-    for file_path in files:
-        documents = load_document(file_path)
-        _, file_name = os.path.split(file_path)
-        logger.info(
-            "Loaded %d documents from '%s'",
-            len(documents),
-            file_name
-        )
-        all_documents.extend(documents)
-
-    logger.info("Loaded %d documents", len(all_documents))
-    return all_documents
-
-
 def print_document_chunks(documents: list[Document], limit: int = 3) -> None:
     """
     Print preview of document chunks with their metadata.

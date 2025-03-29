@@ -11,34 +11,6 @@ logging.basicConfig(
 )
 
 
-def create_vector_db(
-    chunks: list[Document],
-    embeddings_model: Embeddings = None,
-    save_path: str = None
-) -> FAISS:
-    """
-    Create a vector database from document chunks.
-
-    Args:
-        chunks: List of Document chunks to store in the database.
-        embeddings_model: Model to create vector embeddings from text.
-        save_path: Optional path to save the vector database.
-
-    Returns:
-        FAISS vector database containing the document embeddings.
-    """
-    if embeddings_model is None:
-        embeddings_model = OpenAIEmbeddings()
-
-    vector_db = FAISS.from_documents(chunks, embeddings_model)
-
-    if save_path:
-        vector_db.save_local(save_path)
-        logger.info("Vector database saved to %s", save_path)
-
-    return vector_db
-
-
 def load_vector_database(
     db_path,
     embeddings_model: Embeddings = None
