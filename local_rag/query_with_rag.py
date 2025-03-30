@@ -32,13 +32,10 @@ def query(vector_db_path=None):
     )
 
     # Create the RAG prompt template
-    prompt_template = ChatPromptTemplate.from_template(
-    """
-    You are a helpful assistant that provides accurate information
-    based on the given context.
-    If you don't know the answer based on the context,
-    just say that you don't know.
-    Don't try to make up an answer.
+    prompt_template = ChatPromptTemplate.from_template("""
+    You are a helpful assistant that provides accurate information based on
+    the given context. If you don't know the answer based on the context,
+    just say that you don't know. Don't try to make up an answer.
 
     Context:
     {context}
@@ -46,8 +43,7 @@ def query(vector_db_path=None):
     Question: {question}
 
     Answer:
-    """
-    )
+    """)
 
     # Create a retriever from the vector database
     k = 5  # Number of relevant documents to retrieve
