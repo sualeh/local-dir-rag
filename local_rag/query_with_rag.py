@@ -28,7 +28,7 @@ def query(vector_db_path=None):
     # Set up the chat model
     chat_model = ChatOpenAI(
         model_name="gpt-4o",
-        temperature=0.8
+        temperature=0.7
     )
 
     # Create the RAG prompt template
