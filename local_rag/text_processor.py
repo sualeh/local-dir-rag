@@ -3,7 +3,7 @@ import os
 import logging
 import json
 from langchain.schema import Document
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.text_splitter import SentenceTransformersTokenTextSplitter
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -27,10 +27,9 @@ def split_documents(
     Returns:
         List of smaller Document chunks.
     """
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=chunk_size,
-        chunk_overlap=chunk_overlap,
-        separators=["\n\n", "\n", ".", " ", ""],
+    text_splitter = SentenceTransformersTokenTextSplitter(
+        chunk_size=1024,    # in tokens, not characters
+        chunk_overlap=100   # ~10% overlap preserves context
     )
 
     chunks = text_splitter.split_documents(documents)
