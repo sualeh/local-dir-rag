@@ -13,8 +13,8 @@ logger = logging.getLogger(None)
 
 def split_documents(
     documents: list[Document],
-    chunk_size: int = 1000,
-    chunk_overlap: int = 100
+    chunk_size: int = 1024,  # in tokens, not characters
+    chunk_overlap: int = 150  # ~10% overlap preserves context
 ) -> list[Document]:
     """
     Split documents into smaller chunks for better processing.
@@ -28,8 +28,8 @@ def split_documents(
         List of smaller Document chunks.
     """
     text_splitter = SentenceTransformersTokenTextSplitter(
-        chunk_size=1024,    # in tokens, not characters
-        chunk_overlap=100   # ~10% overlap preserves context
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap
     )
 
     chunks = text_splitter.split_documents(documents)
