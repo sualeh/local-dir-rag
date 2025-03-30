@@ -1,17 +1,15 @@
-"""
-    Document Loader Module
-    This module provides functionality to load documents from directories.
-"""
+"""Document Loader Module to load documents from directories."""
 import glob
+
 import os
 import logging
 from langchain_community.document_loaders import PyPDFLoader, TextLoader
 from langchain.schema import Document
 
-logger = logging.getLogger(__name__)
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
+logger = logging.getLogger(None)
 
 
 def get_files_from_directory(

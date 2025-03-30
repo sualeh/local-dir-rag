@@ -5,10 +5,10 @@ import json
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-logger = logging.getLogger(__name__)
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
+logger = logging.getLogger(None)
 
 
 def split_documents(

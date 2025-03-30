@@ -9,10 +9,10 @@ from langchain.schema.output_parser import StrOutputParser
 from local_rag.vector_store import load_vector_database
 from local_rag.text_processor import format_documents, print_sources
 
-logger = logging.getLogger(__name__)
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
+logger = logging.getLogger(None)
 
 
 def query(vector_db_path=None):

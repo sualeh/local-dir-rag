@@ -2,7 +2,6 @@
 
 import os
 import logging
-from dotenv import load_dotenv
 from langchain.embeddings.base import Embeddings
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
