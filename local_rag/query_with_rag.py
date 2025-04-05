@@ -15,7 +15,7 @@ logging.basicConfig(
 logger = logging.getLogger(None)
 
 
-def query(vector_db_path=None):
+def query_loop(vector_db_path=None, k: int = 10):
     """
     Run an interactive RAG-based chat session using a local vector database
     and OpenAI's ChatGPT model.
@@ -46,7 +46,6 @@ def query(vector_db_path=None):
     """)
 
     # Create a retriever from the vector database
-    k = 5  # Number of relevant documents to retrieve
     retriever = vector_db.as_retriever(search_kwargs={"k": k})
 
     # Create the RAG chain
@@ -84,4 +83,4 @@ if __name__ == "__main__":
     load_dotenv(dotenv_path=".env.params")
 
     VECTOR_DB_PATH = os.getenv("VECTOR_DB_PATH")
-    query(VECTOR_DB_PATH)
+    query_loop(VECTOR_DB_PATH)

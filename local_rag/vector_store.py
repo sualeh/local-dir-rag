@@ -43,24 +43,3 @@ def load_vector_database(
     except Exception as e:
         logger.error("Error loading vector database: %s", e)
         return None
-
-
-def query_vector_db(
-    query: str,
-    vector_db: FAISS,
-    k: int = 5
-) -> list[tuple[Document, float]]:
-    """
-    Query the vector database for similar documents.
-
-    Args:
-        query: Query string to search for.
-        vector_db: FAISS vector database to search in.
-        k: Number of results to return.
-
-    Returns:
-        List of tuples containing (Document, similarity_score).
-    """
-    results = vector_db.similarity_search_with_score(query, k=k)
-
-    return results
