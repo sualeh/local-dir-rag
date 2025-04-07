@@ -3,8 +3,10 @@ FROM python:3.13-slim
 WORKDIR /app
 
 # Set pip to not cache and use no color output
-ENV PIP_NO_CACHE_DIR=1 \
+ENV \
+    PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_ROOT_USER_ACTION=ignore \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 
@@ -16,8 +18,8 @@ RUN \
     pip install --upgrade pip && \
     pip install poetry && \
     poetry config virtualenvs.create false && \
-    poetry install --no-dev && \
-    # Clean up cache to reduce image size
+    poetry install --only main && \
+    # Clean up to reduce image size
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
