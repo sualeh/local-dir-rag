@@ -13,12 +13,11 @@ COPY . .
 
 RUN \
     pip install --upgrade pip && \
-    pip install poetry && \
+    pip install poetry
+
+RUN \
     poetry config virtualenvs.create false && \
-    poetry install --only main && \
-    # Clean up to reduce image size
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    poetry install --only main
 
 # Create directories for mounting volumes
 RUN \
