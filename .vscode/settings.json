@@ -7,9 +7,20 @@
 		}
 	},
 	"editor.fontSize": 14,
+	"editor.lineHeight": 24,
 	"editor.minimap.enabled": false,
 	"editor.overviewRulerBorder": false,
 	"editor.wrappingIndent": "indent",
+	"editor.foldingImportsByDefault": true,
+	"editor.tabSize": 4,
+	"files.defaultLanguage": "markdown",
+	"files.exclude": {
+		"**/node_modules": true
+	},
+	"files.trimTrailingWhitespace": true,
+	"git.autofetch": true,
+	"git.enableCommitSigning": true,
+	"git.enableSmartCommit": true,
 	"git.autoStash": true,
 	"git.confirmSync": false,
 	"git.postCommitCommand": "sync",
@@ -31,12 +42,6 @@
 	"python.testing.unittestEnabled": false,
 	"scm.showActionButton": false,
 	"scm.showInputActionButton": false,
-	"todomd.autoArchiveTasks": true,
-	"todomd.autoBumpRecurringOverdueDate": true,
-	"todomd.completionDateIncludeTime": true,
-	"todomd.defaultArchiveFile": "${workspaceFolder}/todo.archive.md",
-	"todomd.defaultFile": "${workspaceFolder}/todo.md",
-	"todomd.defaultSomedayFile": "${workspaceFolder}/someday.md",
 	"window.zoomLevel": 1.2,
 	"workbench.editorAssociations": {
 		"*.md": "vscode.markdown.preview.editor"
