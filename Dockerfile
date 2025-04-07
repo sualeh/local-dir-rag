@@ -11,7 +11,7 @@ ENV \
     PYTHONDONTWRITEBYTECODE=1
 
 # Copy only dependency files first to leverage build cache
-COPY pyproject.toml ./
+COPY pyproject.toml README.md ./
 
 # Install system dependencies, Poetry, and project dependencies in one layer
 RUN \
