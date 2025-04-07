@@ -9,11 +9,11 @@ ENV \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 
-COPY . .
-
 RUN \
     pip install --upgrade pip && \
     pip install poetry
+
+COPY . .
 
 RUN \
     poetry config virtualenvs.create false && \
