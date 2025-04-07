@@ -44,3 +44,9 @@ logs/
 
 # Local configuration
 .local/
+
+# Docker specific
+tests/
+docs/
+*.md
+!README.md
