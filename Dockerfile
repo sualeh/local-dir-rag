@@ -33,4 +33,4 @@ ENV \
 # Switch to non-root user
 USER appuser
 
-ENTRYPOINT ["python", "-m", "local_rag.main"]
+ENTRYPOINT ["python", "-m", "local_dir_rag.main"]

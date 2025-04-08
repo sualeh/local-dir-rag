@@ -1,10 +1,11 @@
-# Local RAG
+# Local Directory RAG
 
 A simple tool for Retrieval-Augmented Generation (RAG) using documents from your local filesystem.
 
 ## Overview
 
-Local RAG allows you to:
+Local Directory RAG allows you to:
+
 1. Create vector embeddings from your local documents (PDF, TXT)
 2. Query these documents using natural language, leveraging OpenAI's language models
 
@@ -28,13 +29,13 @@ pip install -e .
 
 Create a `.env` file in the project root with your OpenAI API key:
 
-```
+```bash
 OPENAI_API_KEY=your-api-key-here
 ```
 
 You can also create a `.env.params` file to set default directories:
 
-```
+```bash
 DOCS_DIRECTORY=path/to/your/documents
 VECTOR_DB_PATH=path/to/save/vector/database
 ```
@@ -44,7 +45,7 @@ VECTOR_DB_PATH=path/to/save/vector/database
 Run locally with the following command, with the approproate arguments:
 
 ```bash
-poetry run python -m local_rag.main
+poetry run python -m local_dir_rag.main
 ```
 
 ## Usage
@@ -53,7 +54,7 @@ poetry run python -m local_rag.main
 
 ```bash
 # Using command line arguments
-python -m local_rag.main embed --docs-directory /path/to/docs --vector-db-path /path/to/vector_db
+python -m local_dir_rag.main embed --docs-directory /path/to/docs --vector-db-path /path/to/vector_db
 
 # Or if installed as a package
 local-dir-rag embed --docs-directory /path/to/docs --vector-db-path /path/to/vector_db
@@ -63,7 +64,7 @@ local-dir-rag embed --docs-directory /path/to/docs --vector-db-path /path/to/vec
 
 ```bash
 # Using command line arguments
-python -m local_rag.main query --vector-db-path /path/to/vector_db
+python -m local_dir_rag.main query --vector-db-path /path/to/vector_db
 
 # Or if installed as a package
 local-dir-rag query --vector-db-path /path/to/vector_db
