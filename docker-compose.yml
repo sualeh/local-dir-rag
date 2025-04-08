@@ -1,6 +1,6 @@
 services:
-  local-rag:
-    image: sualehfatehi/local-rag:latest
+  local-dir-rag:
+    image: sualehfatehi/local-dir-rag:latest
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - DOCS_DIRECTORY=/data/docs

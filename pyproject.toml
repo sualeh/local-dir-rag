@@ -1,5 +1,5 @@
 [project]
-name = "local-rag"
+name = "local-dir-rag"
 version = "0.1.0"
 description = "RAG from documents in a local directory"
 authors = [
@@ -26,4 +26,4 @@ pypdf = ">=5.4.0,<6.0.0"
 sentence-transformers = ">=4.0.1,<5.0.0"
 
 [tool.poetry.scripts]
-local-rag = "local_rag.main:main"
+local-dir-rag = "local_rag.main:main"

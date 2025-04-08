@@ -35,7 +35,7 @@ jobs:
         name: Extract metadata for Docker
         uses: docker/metadata-action@v5
         with:
-          images: ${{ secrets.DOCKERHUB_USERNAME }}/local-rag
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/local-dir-rag
           tags: |
             type=ref,event=branch
             type=ref,event=pr

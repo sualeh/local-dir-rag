@@ -17,8 +17,8 @@ Local RAG allows you to:
 
 ```bash
 # Clone the repository
-git clone https://github.com/sualeh/local-rag.git
-cd local-rag
+git clone https://github.com/sualeh/local-dir-rag.git
+cd local-dir-rag
 
 # Install dependencies
 pip install -e .
@@ -56,7 +56,7 @@ poetry run python -m local_rag.main
 python -m local_rag.main embed --docs-directory /path/to/docs --vector-db-path /path/to/vector_db
 
 # Or if installed as a package
-local-rag embed --docs-directory /path/to/docs --vector-db-path /path/to/vector_db
+local-dir-rag embed --docs-directory /path/to/docs --vector-db-path /path/to/vector_db
 ```
 
 ### Query Documents
@@ -66,7 +66,7 @@ local-rag embed --docs-directory /path/to/docs --vector-db-path /path/to/vector_
 python -m local_rag.main query --vector-db-path /path/to/vector_db
 
 # Or if installed as a package
-local-rag query --vector-db-path /path/to/vector_db
+local-dir-rag query --vector-db-path /path/to/vector_db
 ```
 
 ## Docker Usage
@@ -75,17 +75,17 @@ You can run Local RAG using Docker:
 
 ```bash
 # Pull the Docker image
-docker pull sualeh/local-rag:latest
+docker pull sualeh/local-dir-rag:latest
 
 # Embed documents
 docker run -v /path/to/your/docs:/data/docs -v /path/to/vector_db:/data/vector_db \
   -e OPENAI_API_KEY=your-api-key-here \
-  sualeh/local-rag embed
+  sualeh/local-dir-rag embed
 
 # Query your documents
 docker run -v /path/to/vector_db:/data/vector_db \
   -e OPENAI_API_KEY=your-api-key-here \
-  sualeh/local-rag query
+  sualeh/local-dir-rag query
 ```
 
 You can also pass command line arguments directly:
@@ -93,7 +93,7 @@ You can also pass command line arguments directly:
 ```bash
 docker run -v /path/to/your/docs:/data/docs -v /path/to/output:/data/vector_db \
   -e OPENAI_API_KEY=your-api-key-here \
-  sualeh/local-rag embed --docs-directory /data/docs --vector-db-path /data/vector_db
+  sualeh/local-dir-rag embed --docs-directory /data/docs --vector-db-path /data/vector_db
 ```
 
 ## Docker Compose Usage
@@ -105,8 +105,8 @@ You can also use Docker Compose for easier management of the Local RAG container
 ```yaml
 version: '3'
 services:
-  local-rag:
-    image: sualeh/local-rag:latest
+  local-dir-rag:
+    image: sualeh/local-dir-rag:latest
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
     volumes:
@@ -118,16 +118,16 @@ services:
 
 ```bash
 # For embedding documents
-docker-compose run local-rag embed
+docker-compose run local-dir-rag embed
 
 # For querying documents
-docker-compose run local-rag query
+docker-compose run local-dir-rag query
 ```
 
 You can also pass additional arguments:
 
 ```bash
-docker-compose run local-rag embed --docs-directory /data/docs --vector-db-path /data/vector_db
+docker-compose run local-dir-rag embed --docs-directory /data/docs --vector-db-path /data/vector_db
 ```
 
 This approach simplifies volume mounting and environment variable management, especially when working with the tool regularly.
