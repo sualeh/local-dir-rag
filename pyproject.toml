@@ -27,3 +27,4 @@ sentence-transformers = ">=4.0.1,<5.0.0"
 
 [tool.poetry.scripts]
 local-dir-rag = "local_dir_rag.main:main"
+
