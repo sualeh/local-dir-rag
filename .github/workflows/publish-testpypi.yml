@@ -33,7 +33,7 @@ jobs:
         name: Build package
         shell: bash
         run: |
-          poetry build
+          poetry build --verbose
 
       - id: publish-testpypi
         name: Publish to TestPyPI
@@ -42,3 +42,4 @@ jobs:
           repository-url: https://test.pypi.org/legacy/
           packages-dir: dist/
           skip-existing: true
+          verbose: true
