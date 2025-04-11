@@ -10,9 +10,10 @@ from local_dir_rag.vector_store import load_vector_database
 from local_dir_rag.text_processor import format_documents, print_sources
 
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    level=logging.INFO,
+    format="%(asctime)s `%(funcName)s` %(levelname)s:\n  %(message)s"
 )
-logger = logging.getLogger(None)
+logger = logging.getLogger(__name__)
 
 
 def query_loop(vector_db_path=None, k: int = 10):

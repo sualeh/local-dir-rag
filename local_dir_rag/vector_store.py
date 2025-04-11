@@ -6,9 +6,10 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 
 logging.basicConfig(
-    level=logging.ERROR, format="%(asctime)s - %(levelname)s - %(message)s"
+    level=logging.INFO,
+    format="%(asctime)s `%(funcName)s` %(levelname)s:\n  %(message)s"
 )
-logger = logging.getLogger(None)
+logger = logging.getLogger(__name__)
 
 
 def load_vector_database(

@@ -9,9 +9,10 @@ from local_dir_rag.document_loader import get_files_from_directory, load_documen
 from local_dir_rag.text_processor import split_documents
 
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    level=logging.INFO,
+    format="%(asctime)s `%(funcName)s` %(levelname)s:\n  %(message)s"
 )
-logger = logging.getLogger(None)
+logger = logging.getLogger(__name__)
 
 
 def embed(
@@ -30,7 +31,7 @@ def embed(
     if embeddings_model is None:
         embeddings_model = OpenAIEmbeddings()
     vector_db = None
-    logger.info("Vector database saved to %s", vector_db_path)
+    logger.info("Vector database path %s", vector_db_path)
 
     logger.info("Loading documents from %s", docs_directory)
     files = get_files_from_directory(docs_directory)

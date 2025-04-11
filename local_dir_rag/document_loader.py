@@ -7,9 +7,10 @@ from langchain_community.document_loaders import PyPDFLoader, TextLoader
 from langchain.schema import Document
 
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    level=logging.INFO,
+    format="%(asctime)s `%(funcName)s` %(levelname)s:\n  %(message)s"
 )
-logger = logging.getLogger(None)
+logger = logging.getLogger(__name__)
 
 
 def get_files_from_directory(

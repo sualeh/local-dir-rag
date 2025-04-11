@@ -8,9 +8,10 @@ from local_dir_rag.query_with_rag import query_loop as query_loop
 from local_dir_rag.embed import embed as embed_docs
 
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    level=logging.INFO,
+    format="%(asctime)s `%(funcName)s` %(levelname)s:\n  %(message)s"
 )
-logger = logging.getLogger(None)
+logger = logging.getLogger(__name__)
 
 
 def embed(docs_directory: str = None, vector_db_path: str = None):
