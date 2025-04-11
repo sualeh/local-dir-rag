@@ -50,6 +50,11 @@ def embed(
             continue
         logger.info("Created %d chunks", len(chunks))
         # Add chunks to the vector database
+        if vector_db_path is not None and os.path.exists(vector_db_path):
+            vector_db = FAISS.load_local(
+                vector_db_path,
+                embeddings_model
+            )
         if vector_db is None:
             vector_db = FAISS.from_documents(
                 chunks,
