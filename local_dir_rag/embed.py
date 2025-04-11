@@ -5,6 +5,7 @@ import logging
 from langchain.embeddings.base import Embeddings
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
+from local_dir_rag.vector_store import load_vector_database
 from local_dir_rag.document_loader import get_files_from_directory, load_document
 from local_dir_rag.text_processor import split_documents
 
@@ -30,7 +31,12 @@ def embed(
     """
     if embeddings_model is None:
         embeddings_model = OpenAIEmbeddings()
-    vector_db = None
+    # Attempt to load vector database from the specified path,
+    # if it exists
+    vector_db = load_vector_database(
+        vector_db_path,
+        embeddings_model
+    )
     logger.info("Vector database path %s", vector_db_path)
 
     logger.info("Loading documents from %s", docs_directory)
@@ -50,11 +56,6 @@ def embed(
             continue
         logger.info("Created %d chunks", len(chunks))
         # Add chunks to the vector database
-        if vector_db_path is not None and os.path.exists(vector_db_path):
-            vector_db = FAISS.load_local(
-                vector_db_path,
-                embeddings_model
-            )
         if vector_db is None:
             vector_db = FAISS.from_documents(
                 chunks,
