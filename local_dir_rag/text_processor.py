@@ -3,12 +3,30 @@ import os
 import logging
 import json
 from langchain.schema import Document
-from langchain.text_splitter import SentenceTransformersTokenTextSplitter
+from langchain.text_splitter import (
+    RecursiveCharacterTextSplitter,
+    SentenceTransformersTokenTextSplitter,
+)
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(None)
+
+
+def recursive_character_splitter(chunk_size, chunk_overlap):
+    return RecursiveCharacterTextSplitter(
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
+        separators=["\n\n", "\n", ". ", " ", ""]
+    )
+
+
+def sentence_splitter(chunk_size, chunk_overlap):
+    return SentenceTransformersTokenTextSplitter(
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap
+    )
 
 
 def split_documents(
@@ -27,7 +45,7 @@ def split_documents(
     Returns:
         List of smaller Document chunks.
     """
-    text_splitter = SentenceTransformersTokenTextSplitter(
+    text_splitter = recursive_character_splitter(
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap
     )
@@ -79,9 +97,13 @@ def print_sources(documents: list[Document]) -> str:
         metadata.pop("total_pages", None)
         if "source" in metadata:
             metadata["source"] = os.path.split(metadata["source"])[1]
-        page_content = doc.page_content.replace("\n", "")
-        print(f"Source [{i+1}]:\n"
-              f"{json.dumps(metadata)}\n"
-              f"{page_content[:50]} ... {page_content[-50:]}\n")
+        page_content = doc.page_content.replace("\n", " ")
+        print(
+            f"Source [{i+1}]:\n"
+            f"{json.dumps(metadata)}\n"
+            f"{page_content[:100]}"
+            "\n<... skipped ...>\n"
+            f"{page_content[-100:]}\n"
+        )
 
     return documents
