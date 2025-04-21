@@ -16,6 +16,17 @@ logger = logging.getLogger(__name__)
 
 
 def recursive_character_splitter(chunk_size, chunk_overlap):
+    """
+    Creates a RecursiveCharacterTextSplitter for document chunking.
+
+    Args:
+        chunk_size: Maximum size of each chunk in characters.
+        chunk_overlap: Number of characters of overlap between chunks.
+
+    Returns:
+        RecursiveCharacterTextSplitter:
+            A text splitter configured with the specified parameters.
+    """
     return RecursiveCharacterTextSplitter(
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
@@ -24,6 +35,19 @@ def recursive_character_splitter(chunk_size, chunk_overlap):
 
 
 def sentence_splitter(chunk_size, chunk_overlap):
+    """
+    Creates a SentenceTransformersTokenTextSplitter for token-based
+    document chunking.
+
+    Args:
+        chunk_size: Maximum size of each chunk in tokens.
+        chunk_overlap: Number of tokens of overlap between chunks.
+
+    Returns:
+        SentenceTransformersTokenTextSplitter:
+            A token-based text splitter configured with the specified
+            parameters.
+    """
     return SentenceTransformersTokenTextSplitter(
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap

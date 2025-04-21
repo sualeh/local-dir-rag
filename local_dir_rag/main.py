@@ -4,8 +4,8 @@ import argparse
 import os
 import logging
 from dotenv import load_dotenv
-from local_dir_rag.query_with_rag import query_loop as query_loop
-from local_dir_rag.embed import embed as embed_docs
+from local_dir_rag.query_with_rag import query_loop
+from local_dir_rag.embed import embed_docs
 
 logging.basicConfig(
     level=logging.INFO,

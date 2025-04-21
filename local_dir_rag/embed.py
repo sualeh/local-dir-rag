@@ -16,7 +16,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def embed(
+def embed_docs(
     docs_directory: str = None,
     vector_db_path: str = None,
     embeddings_model: Embeddings = None
@@ -79,4 +79,4 @@ if __name__ == "__main__":
     if _vector_db_path is None or not os.path.exists(_vector_db_path):
         raise ValueError("Vector database path is not set.")
 
-    embed(docs_directory=_docs_directory, vector_db_path=_vector_db_path)
+    embed_docs(docs_directory=_docs_directory, vector_db_path=_vector_db_path)
