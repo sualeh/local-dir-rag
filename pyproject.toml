@@ -1,7 +1,10 @@
+[tool.poetry]
+requires-poetry = ">=2.0,<3.0"
+
 [project]
 name = "local-dir-rag"
-version = "0.2.0"
 description = "RAG from documents in a local directory"
+version = "0.2.0"
 authors = [
     {name = "Sualeh Fatehi",email = "sualeh@hotmail.com"}
 ]
@@ -17,6 +20,13 @@ dependencies = [
     "sentence-transformers (>=4.0.2,<5.0.0)"
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest (>=8.0.0,<9.0.0)",
+    "pytest-cov (>=5.0.0,<6.0.0)",
+    "black (>=24.2.0,<25.0.0)",
+    "pylint (>=3.0.2,<4.0.0)",
+]
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
@@ -24,3 +34,23 @@ build-backend = "poetry.core.masonry.api"
 
 [project.scripts]
 local-dir-rag = "local_dir_rag.main:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+addopts = "--cov=local_dir_rag --cov-report=term-missing"
+
+[tool.coverage.run]
+source = ["local_dir_rag"]
+omit = ["*/__init__.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "pass",
+    "raise ImportError",
+]

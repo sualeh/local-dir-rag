@@ -70,6 +70,26 @@ python -m local_dir_rag.main query --vector-db-path /path/to/vector_db
 local-dir-rag query --vector-db-path /path/to/vector_db
 ```
 
+## Development and Testing
+
+Install development dependencies:
+
+```bash
+pip install -e ".[dev]"
+```
+
+Run tests with coverage:
+
+```bash
+pytest
+```
+
+Generate a coverage report:
+
+```bash
+pytest --cov=local_dir_rag --cov-report=html
+```
+
 ## Docker Usage
 
 You can run Local RAG using Docker:

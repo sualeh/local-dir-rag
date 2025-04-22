@@ -1,9 +1,6 @@
-name: Build and Publish Docker Image
+name: Docker Build and Publish
 
 on:
-  push:
-    branches: [ main ]
-    tags: [ 'v*' ]
   workflow_dispatch:
 
 concurrency:
@@ -14,6 +11,7 @@ jobs:
   build-docker-image:
     name: Build and Publish Docker Image
     runs-on: ubuntu-latest
+
     steps:
       - id: checkout
         name: Checkout repository
@@ -35,7 +33,7 @@ jobs:
         name: Extract metadata for Docker
         uses: docker/metadata-action@v5
         with:
-          images: ${{ secrets.DOCKERHUB_USERNAME }}/local-dir-rag
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr

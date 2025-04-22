@@ -3,6 +3,7 @@ key.txt
 .env.params
 vector_db
 data
+
 poetry.lock
 
 # Created by https://www.toptal.com/developers/gitignore/api/dotenv,python,jupyternotebooks,visualstudiocode,pycharm

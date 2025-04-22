@@ -1,0 +1,77 @@
+name: Build and Test
+
+on:
+  push:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+    - id: checkout
+      uses: actions/checkout@v4
+
+    - id: setup-python
+      name: Set up Python 3.13
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+
+    - id: install-poetry
+      name: Install Poetry
+      shell: bash
+      run: |
+        curl -sSL https://install.python-poetry.org | python3 -
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+        poetry --version
+
+    - id: install-dependencies
+      name: Install dependencies
+      shell: bash
+      run: |
+        poetry install --extras "dev"
+
+    - id: check-compilation
+      name: Check code compilation
+      shell: bash
+      run: |
+        echo "Checking Python syntax..."
+        poetry run python -m compileall -q .
+        echo "Python syntax check completed successfully"
+
+    - id: run-tests
+      name: Run tests with coverage
+      shell: bash
+      run: |
+        echo "Running tests with coverage..."
+        poetry run pytest \
+          --cov=dora_lead_time tests/ \
+          --cov-report=term \
+          --cov-report=xml \
+          --cov-report=lcov \
+          --cov-report=html:coverage.html \
+          --cov-report=annotate:coverage.annotate
+        pip install pycobertura
+        pycobertura show \
+          --format markdown \
+          --output coverage.md \
+          coverage.xml
+        cat coverage.md >> $GITHUB_STEP_SUMMARY
+        echo "Tests completed successfully"
+
+    - id: upload-coverage-report
+      name: Upload coverage report
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: |
+          coverage.md
+          coverage.xml
+          coverage.lcov
+          coverage.html/
+          coverage.annotate/
+        if-no-files-found: warn
