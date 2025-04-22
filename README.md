@@ -75,20 +75,22 @@ local-dir-rag query --vector-db-path /path/to/vector_db
 Install development dependencies:
 
 ```bash
-pip install -e ".[dev]"
+poetry install --extras "dev"
+poetry show --tree
 ```
 
-Run tests with coverage:
+Run all tests:
 
 ```bash
-pytest
+poetry run pytest
 ```
 
-Generate a coverage report:
+Run a single test:
 
 ```bash
-pytest --cov=local_dir_rag --cov-report=html
+poetry run pytest tests/test_document_loader.py::test_load_document
 ```
+
 
 ## Docker Usage
 

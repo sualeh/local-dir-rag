@@ -66,7 +66,6 @@ jobs:
           --cov-report=lcov \
           --cov-report=html:coverage.html \
           --cov-report=annotate:coverage.annotate
-        pip install pycobertura
         pycobertura show \
           --format markdown \
           --output coverage.md \
