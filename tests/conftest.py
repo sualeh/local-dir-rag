@@ -15,18 +15,6 @@ def temp_dir():
 
 
 @pytest.fixture
-def mock_openai_embeddings(monkeypatch):
-    """Mock OpenAI embeddings to avoid API calls during tests."""
-    mock_embed = MagicMock()
-
-    # Return a predictable embedding vector
-    mock_embed.embed_documents.return_value = [[0.1, 0.2, 0.3] * 341]
-    mock_embed.embed_query.return_value = [0.1, 0.2, 0.3] * 341
-
-    return mock_embed
-
-
-@pytest.fixture
 def sample_documents():
     """Create sample documents for testing."""
     return [
@@ -43,22 +31,6 @@ def sample_documents():
             metadata={"source": "test_doc_3.txt", "page": 1}
         )
     ]
-
-
-@pytest.fixture
-def mock_faiss_db(sample_documents, mock_openai_embeddings):
-    """Create a mock FAISS database with sample documents."""
-    with TemporaryDirectory() as td:
-        db_path = os.path.join(td, "vector_db")
-
-        # Create a real FAISS database with our mock embeddings
-        db = FAISS.from_documents(
-            documents=sample_documents,
-            embedding=mock_openai_embeddings
-        )
-        db.save_local(db_path)
-
-        yield db_path
 
 
 @pytest.fixture

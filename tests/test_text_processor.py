@@ -11,15 +11,15 @@ from local_dir_rag.text_processor import (
 def test_recursive_character_splitter():
     """Test creating a recursive character splitter."""
     splitter = recursive_character_splitter(100, 20)
-    assert splitter.chunk_size == 100
-    assert splitter.chunk_overlap == 20
+    assert splitter._chunk_size == 100
+    assert splitter._chunk_overlap == 20
 
 
 def test_sentence_splitter():
     """Test creating a sentence transformer splitter."""
     splitter = sentence_splitter(100, 20)
-    assert splitter.chunk_size == 100
-    assert splitter.chunk_overlap == 20
+    assert splitter._chunk_size == 100
+    assert splitter._chunk_overlap == 20
 
 
 def test_split_documents():
