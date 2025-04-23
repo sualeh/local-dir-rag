@@ -42,8 +42,6 @@ jobs:
       name: Install dependencies
       shell: bash
       run: |
-        poetry lock
-        poetry show --tree
         poetry install --extras "dev"
 
     - id: check-compilation
