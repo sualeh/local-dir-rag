@@ -2,6 +2,9 @@ name: Docker Build and Publish
 
 on:
   workflow_dispatch:
+  push:
+    tags:
+      - 'v*'  # Trigger on version tags like v1.0.0
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
