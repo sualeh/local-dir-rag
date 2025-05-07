@@ -58,7 +58,6 @@ def main():
     """
     # Load environment variables
     load_dotenv()
-    load_dotenv(dotenv_path=".env.params")
 
     # Set up the argument parser
     parser = argparse.ArgumentParser(

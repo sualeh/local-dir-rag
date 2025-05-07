@@ -3,8 +3,6 @@ services:
     image: sualehfatehi/local-dir-rag:latest
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - DOCS_DIRECTORY=/data/docs
-      - VECTOR_DB_PATH=/data/vector_db
     volumes:
-      - ./data/docs:/data/docs
-      - ./data/vector_db:/data/vector_db
+      - ${DOCS_DIRECTORY}:/data/docs
+      - ${VECTOR_DB_PATH}:/data/vector_db

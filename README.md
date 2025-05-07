@@ -12,145 +12,103 @@ Local Directory RAG allows you to:
 ## Requirements
 
 - Python 3.13 or higher
-- OpenAI API key (set in your .env file)
+- OpenAI API key and other parameters (set in your .env file)
 
 ## Installation
 
-```bash
-# Clone the repository
-git clone https://github.com/sualeh/local-dir-rag.git
-cd local-dir-rag
+This project uses [Poetry](https://python-poetry.org/) for dependency management.
 
-# Install dependencies
-pip install -e .
-```
+1. Install Poetry by following the instructions in the [official documentation](https://python-poetry.org/docs/#installation).
+
+    Quick installation methods:
+
+    ```bash
+    # For Linux, macOS, Windows (WSL)
+    curl -sSL https://install.python-poetry.org | python3 -
+    ```
+
+    ```pwsh
+    # For Windows PowerShell
+    (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | python -
+    ```
+
+2. Install Project Dependencies
+
+    ```bash
+    # Clone the repository
+    git clone https://github.com/sualeh/local-dir-rag.git
+    cd local-dir-rag
+    ```
+
+3. Install dependencies using Poetry
+
+    ```bash
+    poetry install --extras "dev"
+    poetry show --tree
+    ```
+
 
 ## Configuration
 
-Create a `.env` file in the project root with your OpenAI API key:
+Copy the ".env.example" file as ".env" in the project root. Update it with your OpenAI API key, location of your documents, and where you would like the vector database to be created.
 
-```bash
-OPENAI_API_KEY=your-api-key-here
-```
-
-You can also create a `.env.params` file to set default directories:
-
-```bash
-DOCS_DIRECTORY=path/to/your/documents
-VECTOR_DB_PATH=path/to/save/vector/database
-```
-
-## Run Locally
-
-Run locally with the following command, with the approproate arguments:
-
-```bash
-poetry run python -m local_dir_rag.main
-```
 
 ## Usage
 
-### Create Vector Database
+1. Create Vector Database
 
-```bash
-# Using command line arguments
-python -m local_dir_rag.main embed --docs-directory /path/to/docs --vector-db-path /path/to/vector_db
+    ```bash
+    poetry run python -m local_dir_rag.main embed --docs-directory /path/to/docs --vector-db-path /path/to/vector_db
+    ```
 
-# Or if installed as a package
-local-dir-rag embed --docs-directory /path/to/docs --vector-db-path /path/to/vector_db
-```
+2. Query Documents
 
-### Query Documents
+    ```bash
+    poetry run python -m local_dir_rag.main query --vector-db-path /path/to/vector_db
+    ```
 
-```bash
-# Using command line arguments
-python -m local_dir_rag.main query --vector-db-path /path/to/vector_db
-
-# Or if installed as a package
-local-dir-rag query --vector-db-path /path/to/vector_db
-```
 
 ## Development and Testing
 
-Install development dependencies:
+1. Install dependencies, as above.
 
-```bash
-poetry install --extras "dev"
-poetry show --tree
-```
+2. Run all tests:
 
-Run all tests:
+    ```bash
+    poetry run pytest
+    ```
 
-```bash
-poetry run pytest
-```
+    Or, run a single test:
 
-Run a single test:
+    ```bash
+    poetry run pytest tests/test_document_loader.py::test_load_document
+    ```
 
-```bash
-poetry run pytest tests/test_document_loader.py::test_load_document
-```
-
-
-## Docker Usage
-
-You can run Local RAG using Docker:
-
-```bash
-# Pull the Docker image
-docker pull sualeh/local-dir-rag:latest
-
-# Embed documents
-docker run -v /path/to/your/docs:/data/docs -v /path/to/vector_db:/data/vector_db \
-  -e OPENAI_API_KEY=your-api-key-here \
-  sualeh/local-dir-rag embed
-
-# Query your documents
-docker run -v /path/to/vector_db:/data/vector_db \
-  -e OPENAI_API_KEY=your-api-key-here \
-  sualeh/local-dir-rag query
-```
-
-You can also pass command line arguments directly:
-
-```bash
-docker run -v /path/to/your/docs:/data/docs -v /path/to/output:/data/vector_db \
-  -e OPENAI_API_KEY=your-api-key-here \
-  sualeh/local-dir-rag embed --docs-directory /data/docs --vector-db-path /data/vector_db
-```
 
 ## Docker Compose Usage
 
 You can also use Docker Compose for easier management of the Local RAG container:
 
-1. Create a `docker-compose.yml` file:
+1. Clone the project, as described above.
 
-```yaml
-version: '3'
-services:
-  local-dir-rag:
-    image: sualeh/local-dir-rag:latest
-    environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-    volumes:
-      - ./docs:/data/docs
-      - ./vector_db:/data/vector_db
-```
+2. Configure the ".env" file as described above.
 
-2. Run the application:
+3. Run the application using Docker Compose:
 
-```bash
-# For embedding documents
-docker-compose run local-dir-rag embed
+      ```bash
+      # For embedding documents
+      docker-compose run local-dir-rag embed
+      ```
 
-# For querying documents
-docker-compose run local-dir-rag query
-```
+      ```bash
+      # For querying documents
+      docker-compose run local-dir-rag query
+      ```
 
-You can also pass additional arguments:
+      You can also pass additional arguments:
 
-```bash
-docker-compose run local-dir-rag embed --docs-directory /data/docs --vector-db-path /data/vector_db
-```
+      ```bash
+      docker-compose run local-dir-rag embed --docs-directory /data/docs --vector-db-path /data/vector_db
+      ```
 
 This approach simplifies volume mounting and environment variable management, especially when working with the tool regularly.

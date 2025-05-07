@@ -81,7 +81,6 @@ def query_loop(vector_db_path=None, k: int = 10):
 if __name__ == "__main__":
     # Load environment variables
     load_dotenv()
-    load_dotenv(dotenv_path=".env.params")
 
     VECTOR_DB_PATH = os.getenv("VECTOR_DB_PATH")
     query_loop(VECTOR_DB_PATH)
