@@ -50,18 +50,18 @@ This project uses [Poetry](https://python-poetry.org/) for dependency management
 
 ## Configuration
 
-Copy the ".env.example" file as ".env" in the project root. Update it with your OpenAI API key, location of your documents, and where you would like the vector database to be created.
+Create an ".env" file in the project root based on ".env.example". Update it with your OpenAI API key, location of your documents, and where you would like the vector database to be created.
 
 
 ## Usage
 
-1. Create Vector Database
+1. Create vector database
 
     ```bash
     poetry run python -m local_dir_rag.main embed --docs-directory /path/to/docs --vector-db-path /path/to/vector_db
     ```
 
-2. Query Documents
+2. Query documents
 
     ```bash
     poetry run python -m local_dir_rag.main query --vector-db-path /path/to/vector_db
