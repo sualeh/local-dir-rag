@@ -1,3 +1,5 @@
+"""Utilities for loading and managing the local FAISS vector store."""
+
 import os
 import logging
 from langchain_core.embeddings import Embeddings
