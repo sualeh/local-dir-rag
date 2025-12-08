@@ -1,7 +1,6 @@
 import os
 import logging
-from langchain.schema import Document
-from langchain.embeddings.base import Embeddings
+from langchain_core.embeddings import Embeddings
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 

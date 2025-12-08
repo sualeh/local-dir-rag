@@ -2,7 +2,7 @@ import os
 import pytest
 from tempfile import TemporaryDirectory
 from unittest.mock import MagicMock
-from langchain.schema import Document
+from langchain_core.documents import Document
 from langchain_community.vectorstores import FAISS
 from local_dir_rag.embed import embed_docs
 

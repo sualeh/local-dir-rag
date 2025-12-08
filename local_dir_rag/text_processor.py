@@ -1,9 +1,9 @@
 """Processor for splitting documents into chunks and formatting them."""
-import os
-import logging
 import json
-from langchain.schema import Document
-from langchain.text_splitter import (
+import logging
+import os
+from langchain_core.documents import Document
+from langchain_text_splitters import (
     RecursiveCharacterTextSplitter,
     SentenceTransformersTokenTextSplitter,
 )

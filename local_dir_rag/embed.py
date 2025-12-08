@@ -2,7 +2,7 @@
 
 import os
 import logging
-from langchain.embeddings.base import Embeddings
+from langchain_core.embeddings import Embeddings
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 from local_dir_rag.vector_store import load_vector_database
