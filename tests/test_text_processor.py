@@ -1,4 +1,4 @@
-import pytest
+# pylint: disable=protected-access
 from langchain_core.documents import Document
 from local_dir_rag.text_processor import (
     split_documents,

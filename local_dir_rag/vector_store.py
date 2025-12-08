@@ -40,6 +40,10 @@ def load_vector_database(
         )
         logger.info("Vector database successfully loaded from %s", db_path)
         return vector_db
-    except Exception as e:
-        logger.error("Error loading vector database: %s", e)
+    except (FileNotFoundError, OSError, ValueError) as error:
+        logger.error(
+            "Error loading vector database from %s: %s",
+            db_path,
+            error,
+        )
         return None

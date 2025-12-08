@@ -1,10 +1,10 @@
 import os
-import pytest
 from tempfile import TemporaryDirectory
-from unittest.mock import MagicMock
+
+import pytest
 from langchain_core.documents import Document
-from langchain_community.vectorstores import FAISS
-from local_dir_rag.embed import embed_docs
+
+# pylint: disable=redefined-outer-name
 
 
 @pytest.fixture
@@ -19,15 +19,24 @@ def sample_documents():
     """Create sample documents for testing."""
     return [
         Document(
-            page_content="This is a test document about artificial intelligence.",
+            page_content=(
+                "This is a test document about artificial "
+                "intelligence."
+            ),
             metadata={"source": "test_doc_1.txt", "page": 1}
         ),
         Document(
-            page_content="RAG systems combine retrieval with generation for better answers.",
+            page_content=(
+                "RAG systems combine retrieval with generation for "
+                "better answers."
+            ),
             metadata={"source": "test_doc_2.txt", "page": 1}
         ),
         Document(
-            page_content="Vector databases store embeddings for efficient similarity search.",
+            page_content=(
+                "Vector databases store embeddings for efficient "
+                "similarity search."
+            ),
             metadata={"source": "test_doc_3.txt", "page": 1}
         )
     ]
@@ -43,10 +52,16 @@ def test_file_structure(temp_dir):
     file_paths = []
     for i in range(3):
         file_path = os.path.join(docs_dir, f"test_doc_{i}.txt")
-        with open(file_path, "w") as f:
-            f.write(f"This is test document {i} with some content for testing.\n")
-            f.write(f"It contains multiple sentences to test chunking.\n")
-            f.write(f"Each document has unique content to identify it in searches.")
+        with open(file_path, "w", encoding="utf-8") as file_handle:
+            file_handle.write(
+                f"This is test document {i} with some content for testing.\n"
+            )
+            file_handle.write(
+                "It contains multiple sentences to test chunking.\n"
+            )
+            file_handle.write(
+                "Each document has unique content to identify it in searches."
+            )
         file_paths.append(file_path)
 
     return docs_dir, file_paths
