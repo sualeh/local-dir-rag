@@ -5,6 +5,7 @@ import sqlite3
 from local_dir_rag.file_tracker import (
     FileTracker,
     FileStatus,
+    FileState,
     compute_file_checksum,
 )
 
@@ -43,7 +44,7 @@ def test_file_tracker_init(temp_dir):
     assert os.path.exists(tracker.db_path)
     assert tracker.db_path == os.path.join(vector_db_path, "file_tracker.db")
 
-    # Table should exist
+    # Table should exist with correct columns
     with sqlite3.connect(tracker.db_path) as conn:
         cursor = conn.cursor()
         cursor.execute(
@@ -51,6 +52,15 @@ def test_file_tracker_init(temp_dir):
             "AND name='file_checksums'"
         )
         assert cursor.fetchone() is not None
+
+        # Verify columns exist
+        cursor.execute("PRAGMA table_info(file_checksums)")
+        columns = {row[1] for row in cursor.fetchall()}
+        assert "file_path" in columns
+        assert "directory_path" in columns
+        assert "file_name" in columns
+        assert "checksum" in columns
+        assert "indexed_at" in columns
 
 
 def test_file_status_new_file(temp_dir):
@@ -139,6 +149,36 @@ def test_update_file_checksum(temp_dir):
     assert status3.is_modified is False
 
 
+def test_file_name_and_directory_stored_separately(temp_dir):
+    """Test that file_name and directory_path are stored separately."""
+    vector_db_path = os.path.join(temp_dir, "vector_db")
+    tracker = FileTracker(vector_db_path)
+
+    # Create a file in a subdirectory
+    subdir = os.path.join(temp_dir, "subdir")
+    os.makedirs(subdir, exist_ok=True)
+    file_path = os.path.join(subdir, "test_file.txt")
+    with open(file_path, "w", encoding="utf-8") as f:
+        f.write("test content")
+
+    tracker.update_file_checksum(file_path)
+
+    # Verify the database has separate columns
+    with sqlite3.connect(tracker.db_path) as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT file_path, directory_path, file_name "
+            "FROM file_checksums WHERE file_path = ?",
+            (file_path,)
+        )
+        row = cursor.fetchone()
+
+    assert row is not None
+    assert row[0] == file_path
+    assert row[1] == subdir
+    assert row[2] == "test_file.txt"
+
+
 def test_remove_file(temp_dir):
     """Test removing a file from the tracker."""
     vector_db_path = os.path.join(temp_dir, "vector_db")
@@ -210,23 +250,26 @@ def test_file_status_dataclass():
     # New file needs indexing
     status_new = FileStatus(
         file_path="/path/to/file.txt",
-        is_new=True,
-        is_modified=False
+        state=FileState.NEW
     )
+    assert status_new.is_new is True
+    assert status_new.is_modified is False
     assert status_new.needs_indexing is True
 
     # Modified file needs indexing
     status_modified = FileStatus(
         file_path="/path/to/file.txt",
-        is_new=False,
-        is_modified=True
+        state=FileState.MODIFIED
     )
+    assert status_modified.is_new is False
+    assert status_modified.is_modified is True
     assert status_modified.needs_indexing is True
 
     # Unchanged file does not need indexing
     status_unchanged = FileStatus(
         file_path="/path/to/file.txt",
-        is_new=False,
-        is_modified=False
+        state=FileState.UNCHANGED
     )
+    assert status_unchanged.is_new is False
+    assert status_unchanged.is_modified is False
     assert status_unchanged.needs_indexing is False

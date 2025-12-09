@@ -4,13 +4,14 @@ from unittest.mock import MagicMock
 
 import pytest
 from langchain_core.documents import Document
+from langchain_core.embeddings import Embeddings
 
 from local_dir_rag.embed import embed_docs
 from local_dir_rag.file_tracker import FileTracker
 from local_dir_rag.vector_store import remove_documents_by_source
 
 
-class MockEmbeddings:
+class MockEmbeddings(Embeddings):
     """Mock embeddings model for testing."""
 
     def embed_documents(self, texts: list[str]) -> list[list[float]]:

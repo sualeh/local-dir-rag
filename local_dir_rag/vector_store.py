@@ -65,8 +65,10 @@ def load_vector_database(
     if embeddings_model is None:
         embeddings_model = OpenAIEmbeddings()
 
-    if not os.path.exists(db_path):
-        logger.error("Error: Vector database not found at %s", db_path)
+    # Check if the FAISS index file exists (not just the directory)
+    index_file = os.path.join(db_path, "index.faiss")
+    if not os.path.exists(index_file):
+        logger.info("No existing vector database found at %s", db_path)
         return None
 
     try:

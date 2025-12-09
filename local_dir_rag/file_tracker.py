@@ -5,6 +5,7 @@ import logging
 import os
 import sqlite3
 from dataclasses import dataclass
+from enum import Enum
 
 logging.basicConfig(
     level=logging.INFO,
@@ -13,17 +14,33 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+class FileState(Enum):
+    """Enumeration of possible file states relative to the tracker."""
+    NEW = "new"
+    MODIFIED = "modified"
+    UNCHANGED = "unchanged"
+
+
 @dataclass
 class FileStatus:
     """Status of a file relative to the tracker database."""
     file_path: str
-    is_new: bool
-    is_modified: bool
+    state: FileState
+
+    @property
+    def is_new(self) -> bool:
+        """Check if the file is new."""
+        return self.state == FileState.NEW
+
+    @property
+    def is_modified(self) -> bool:
+        """Check if the file has been modified."""
+        return self.state == FileState.MODIFIED
 
     @property
     def needs_indexing(self) -> bool:
         """Check if the file needs to be indexed."""
-        return self.is_new or self.is_modified
+        return self.state in (FileState.NEW, FileState.MODIFIED)
 
 
 def compute_file_checksum(file_path: str) -> str:
@@ -74,6 +91,8 @@ class FileTracker:
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS file_checksums (
                     file_path TEXT PRIMARY KEY,
+                    directory_path TEXT NOT NULL,
+                    file_name TEXT NOT NULL,
                     checksum TEXT NOT NULL,
                     indexed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
@@ -104,17 +123,19 @@ class FileTracker:
         if row is None:
             return FileStatus(
                 file_path=file_path,
-                is_new=True,
-                is_modified=False
+                state=FileState.NEW
             )
 
         stored_checksum = row[0]
-        is_modified = current_checksum != stored_checksum
+        if current_checksum != stored_checksum:
+            return FileStatus(
+                file_path=file_path,
+                state=FileState.MODIFIED
+            )
 
         return FileStatus(
             file_path=file_path,
-            is_new=False,
-            is_modified=is_modified
+            state=FileState.UNCHANGED
         )
 
     def update_file_checksum(self, file_path: str) -> None:
@@ -125,13 +146,15 @@ class FileTracker:
             file_path: Absolute path to the file.
         """
         checksum = compute_file_checksum(file_path)
+        directory_path, file_name = os.path.split(file_path)
 
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                INSERT OR REPLACE INTO file_checksums (file_path, checksum)
-                VALUES (?, ?)
-            """, (file_path, checksum))
+                INSERT OR REPLACE INTO file_checksums
+                    (file_path, directory_path, file_name, checksum)
+                VALUES (?, ?, ?, ?)
+            """, (file_path, directory_path, file_name, checksum))
             conn.commit()
 
         logger.info("Updated checksum for %s", file_path)
