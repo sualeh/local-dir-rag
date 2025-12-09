@@ -49,3 +49,32 @@ def test_load_document_unsupported_format(temp_dir):
 
     docs = load_document(file_path)
     assert len(docs) == 0
+
+
+def test_get_files_from_subdirectories(test_file_structure_with_subdirs):
+    """Test that files in subdirectories are found recursively."""
+    docs_dir, _ = test_file_structure_with_subdirs
+
+    # Should find all 6 files: 2 in root, 2 in subdir1, 1 in subdir2,
+    # 1 in nested
+    files = get_files_from_directory(docs_dir, extensions=[".txt"])
+    assert len(files) == 6
+
+    # Verify all expected files are found
+    found_files = set(os.path.basename(f) for f in files)
+    expected_files = {
+        "root_doc_0.txt", "root_doc_1.txt",
+        "subdir1_doc_0.txt", "subdir1_doc_1.txt",
+        "subdir2_doc.txt", "nested_doc.txt"
+    }
+    assert found_files == expected_files
+
+
+def test_get_files_from_nested_subdirectory(test_file_structure_with_subdirs):
+    """Test that deeply nested files are found."""
+    docs_dir, _ = test_file_structure_with_subdirs
+
+    files = get_files_from_directory(docs_dir, extensions=[".txt"])
+    nested_files = [f for f in files if "nested" in f]
+    assert len(nested_files) == 1
+    assert "nested_doc.txt" in nested_files[0]
