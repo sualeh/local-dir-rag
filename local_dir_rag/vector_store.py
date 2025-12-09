@@ -1,7 +1,8 @@
+"""Utilities for loading and managing the local FAISS vector store."""
+
 import os
 import logging
-from langchain.schema import Document
-from langchain.embeddings.base import Embeddings
+from langchain_core.embeddings import Embeddings
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 
@@ -41,6 +42,10 @@ def load_vector_database(
         )
         logger.info("Vector database successfully loaded from %s", db_path)
         return vector_db
-    except Exception as e:
-        logger.error("Error loading vector database: %s", e)
+    except (FileNotFoundError, OSError, ValueError) as error:
+        logger.error(
+            "Error loading vector database from %s: %s",
+            db_path,
+            error,
+        )
         return None

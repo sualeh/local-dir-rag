@@ -1,13 +1,18 @@
 """Main entry point for the local-dir-rag package."""
 
-import os
 import logging
-from langchain.embeddings.base import Embeddings
+import os
+
+from langchain_core.embeddings import Embeddings
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
-from local_dir_rag.vector_store import load_vector_database
-from local_dir_rag.document_loader import get_files_from_directory, load_document
+
+from local_dir_rag.document_loader import (
+    get_files_from_directory,
+    load_document,
+)
 from local_dir_rag.text_processor import split_documents
+from local_dir_rag.vector_store import load_vector_database
 
 logging.basicConfig(
     level=logging.INFO,

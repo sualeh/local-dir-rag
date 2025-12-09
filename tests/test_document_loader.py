@@ -1,11 +1,13 @@
 import os
-import pytest
-from local_dir_rag.document_loader import get_files_from_directory, load_document
+from local_dir_rag.document_loader import (
+    get_files_from_directory,
+    load_document,
+)
 
 
 def test_get_files_from_directory(test_file_structure):
     """Test getting files from a directory with specific extensions."""
-    docs_dir, expected_files = test_file_structure
+    docs_dir, _ = test_file_structure
 
     # Test with default extensions
     files = get_files_from_directory(docs_dir)
