@@ -4,7 +4,7 @@ requires-poetry = ">=2.0,<3.0"
 [project]
 name = "local-dir-rag"
 description = "RAG from documents in a local directory"
-version = "0.4.1"
+version = "1.0.0"
 authors = [
     {name = "Sualeh Fatehi",email = "sualeh@hotmail.com"}
 ]
