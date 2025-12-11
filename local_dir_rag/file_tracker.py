@@ -91,12 +91,13 @@ class FileTracker:
             cursor = conn.cursor()
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS file_checksums (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
                     directory_path TEXT NOT NULL,
                     file_name TEXT NOT NULL,
                     checksum TEXT NOT NULL,
                     file_size INTEGER,
                     indexed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    PRIMARY KEY (directory_path, file_name)
+                    UNIQUE (directory_path, file_name)
                 )
             """)
             conn.commit()

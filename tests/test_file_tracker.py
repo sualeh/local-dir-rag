@@ -57,6 +57,7 @@ def test_file_tracker_init(temp_dir):
         # Verify columns exist
         cursor.execute("PRAGMA table_info(file_checksums)")
         columns = {row[1] for row in cursor.fetchall()}
+        assert "id" in columns
         assert "directory_path" in columns
         assert "file_name" in columns
         assert "checksum" in columns
