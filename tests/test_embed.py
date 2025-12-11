@@ -32,6 +32,36 @@ def docs_and_vector_db(temp_dir):
     return docs_dir, vector_db_path
 
 
+def test_embed_multiple_directories(temp_dir):
+    """Test embedding files across multiple document directories."""
+    docs_dir_one = os.path.join(temp_dir, "docs_one")
+    docs_dir_two = os.path.join(temp_dir, "docs_two")
+    vector_db_path = os.path.join(temp_dir, "vector_db")
+    os.makedirs(docs_dir_one, exist_ok=True)
+    os.makedirs(docs_dir_two, exist_ok=True)
+
+    file1 = os.path.join(docs_dir_one, "file1.txt")
+    file2 = os.path.join(docs_dir_two, "file2.txt")
+
+    with open(file1, "w", encoding="utf-8") as f:
+        f.write("Content for file 1. " * 5)
+    with open(file2, "w", encoding="utf-8") as f:
+        f.write("Content for file 2. " * 5)
+
+    mock_embeddings = MockEmbeddings()
+    vector_db = embed_docs(
+        docs_paths=os.pathsep.join([docs_dir_one, docs_dir_two]),
+        vector_db_path=vector_db_path,
+        embeddings_model=mock_embeddings
+    )
+
+    assert vector_db is not None
+
+    tracker = FileTracker(vector_db_path)
+    tracked_files = tracker.get_all_tracked_files()
+    assert set(tracked_files) == {file1, file2}
+
+
 def test_embed_new_files(docs_and_vector_db):
     """Test embedding new files creates tracker entries."""
     docs_dir, vector_db_path = docs_and_vector_db
@@ -48,7 +78,7 @@ def test_embed_new_files(docs_and_vector_db):
 
     # Run embedding
     vector_db = embed_docs(
-        docs_directory=docs_dir,
+        docs_paths=docs_dir,
         vector_db_path=vector_db_path,
         embeddings_model=mock_embeddings
     )
@@ -75,7 +105,7 @@ def test_skip_unchanged_files(docs_and_vector_db):
 
     # First run
     vector_db1 = embed_docs(
-        docs_directory=docs_dir,
+        docs_paths=docs_dir,
         vector_db_path=vector_db_path,
         embeddings_model=mock_embeddings
     )
@@ -83,7 +113,7 @@ def test_skip_unchanged_files(docs_and_vector_db):
 
     # Second run without changes
     vector_db2 = embed_docs(
-        docs_directory=docs_dir,
+        docs_paths=docs_dir,
         vector_db_path=vector_db_path,
         embeddings_model=mock_embeddings
     )
@@ -105,7 +135,7 @@ def test_reindex_modified_files(docs_and_vector_db):
 
     # First run
     vector_db1 = embed_docs(
-        docs_directory=docs_dir,
+        docs_paths=docs_dir,
         vector_db_path=vector_db_path,
         embeddings_model=mock_embeddings
     )
@@ -117,7 +147,7 @@ def test_reindex_modified_files(docs_and_vector_db):
 
     # Second run
     vector_db2 = embed_docs(
-        docs_directory=docs_dir,
+        docs_paths=docs_dir,
         vector_db_path=vector_db_path,
         embeddings_model=mock_embeddings
     )
@@ -149,7 +179,7 @@ def test_add_new_file_incrementally(docs_and_vector_db):
 
     # First run
     vector_db1 = embed_docs(
-        docs_directory=docs_dir,
+        docs_paths=docs_dir,
         vector_db_path=vector_db_path,
         embeddings_model=mock_embeddings
     )
@@ -162,7 +192,7 @@ def test_add_new_file_incrementally(docs_and_vector_db):
 
     # Second run
     vector_db2 = embed_docs(
-        docs_directory=docs_dir,
+        docs_paths=docs_dir,
         vector_db_path=vector_db_path,
         embeddings_model=mock_embeddings
     )
@@ -193,7 +223,7 @@ def test_handle_deleted_files(docs_and_vector_db):
 
     # First run
     vector_db1 = embed_docs(
-        docs_directory=docs_dir,
+        docs_paths=docs_dir,
         vector_db_path=vector_db_path,
         embeddings_model=mock_embeddings
     )
@@ -204,7 +234,7 @@ def test_handle_deleted_files(docs_and_vector_db):
 
     # Second run
     vector_db2 = embed_docs(
-        docs_directory=docs_dir,
+        docs_paths=docs_dir,
         vector_db_path=vector_db_path,
         embeddings_model=mock_embeddings
     )
@@ -233,7 +263,7 @@ def test_sqlite_db_location(docs_and_vector_db):
 
     # Run embedding
     embed_docs(
-        docs_directory=docs_dir,
+        docs_paths=docs_dir,
         vector_db_path=vector_db_path,
         embeddings_model=mock_embeddings
     )

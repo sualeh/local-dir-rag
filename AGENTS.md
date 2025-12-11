@@ -5,14 +5,14 @@ Project-specific guidance to make AI contributions consistent and productive.
 ## Architecture and Flow
 
 - CLI entrypoint `local_dir_rag.main`: subcommands `embed` and `query`; invoked via `python -m local_dir_rag.main` or script `local-dir-rag`.
-- Embedding pipeline (`embed_docs` in `local_dir_rag/embed.py`): load files from `DOCS_DIRECTORY`, accept `.pdf`/`.txt` only, split into chunks (`text_processor.split_documents`), store in FAISS via `vector_store.load_vector_database` (append if existing) and `FAISS.save_local(vector_db_path)`.
+- Embedding pipeline (`embed_docs` in `local_dir_rag/embed.py`): load files from `DOCS_PATH` (supports multiple paths separated by `os.pathsep`), accept `.pdf`/`.txt` only, split into chunks (`text_processor.split_documents`), store in FAISS via `vector_store.load_vector_database` (append if existing) and `FAISS.save_local(vector_db_path)`.
 - Query pipeline (`query_with_rag.py`): load FAISS from `VECTOR_DB_PATH`, retriever `k=10`, prompt template inside file, ChatOpenAI `model_name="gpt-4o"`, `temperature=0.7`; prints sources via `print_sources` (metadata keys stripped, filenames shortened) before formatting context.
 - Vector store loader (`vector_store.load_vector_database`): uses `OpenAIEmbeddings`; `allow_dangerous_deserialization=True` required by FAISS load.
 
 ## Configuration and Secrets
 
-- Required env vars: `OPENAI_API_KEY`, `DOCS_DIRECTORY`, `VECTOR_DB_PATH`; sample in `.env.example`. `.env` is loaded in `main.py` and `query_with_rag.py` via `python-dotenv`.
-- For Docker: container expects docs at `/data/docs`, vector DB at `/data/vector_db`; compose mounts `${DOCS_DIRECTORY}` and `${VECTOR_DB_PATH}` into those paths.
+- Required env vars: `OPENAI_API_KEY`, `DOCS_PATH`, `VECTOR_DB_PATH`; sample in `.env.example`. `.env` is loaded in `main.py` and `query_with_rag.py` via `python-dotenv`.
+- For Docker: container expects docs at `/data/docs`, vector DB at `/data/vector_db`; compose mounts `${DOCS_PATH}` and `${VECTOR_DB_PATH}` into those paths (use a single path when running via Docker Compose).
 
 ## Workflows
 

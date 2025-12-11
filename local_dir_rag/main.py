@@ -14,25 +14,26 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def embed(docs_directory: str = None, vector_db_path: str = None):
+def embed(docs_paths: str | list[str] = None, vector_db_path: str = None):
     """
     Create and save a vector database from documents.
 
     Args:
-        docs_directory (str, optional): Directory containing documents to
-            process.
+        docs_paths (str | list[str], optional): One or more document
+            directories. Strings may contain multiple paths separated by
+            ``os.pathsep``.
         vector_db_path (str, optional): Path to save the vector database.
     """
-    docs_directory = docs_directory or os.getenv("DOCS_DIRECTORY")
-    if docs_directory is None:
-        raise ValueError("Documents directory is not set.")
+    docs_paths = docs_paths or os.getenv("DOCS_PATH")
+    if docs_paths is None:
+        raise ValueError("Documents path is not set.")
 
     vector_db_path = vector_db_path or os.getenv("VECTOR_DB_PATH")
     if vector_db_path is None:
         raise ValueError("Vector database path is not set.")
 
     return embed_docs(
-        docs_directory=docs_directory,
+        docs_paths=docs_paths,
         vector_db_path=vector_db_path
     )
 
@@ -74,9 +75,14 @@ def main():
         help="Create a vector database from documents"
     )
     embed_parser.add_argument(
+        "--docs-paths",
         "--docs-directory",
+        dest="docs_paths",
         required=False,
-        help="Directory containing documents to embed"
+        help=(
+            "One or more directories containing documents to embed. "
+            f"Separate multiple paths with '{os.pathsep}'."
+        )
     )
     embed_parser.add_argument(
         "--vector-db-path",
@@ -98,7 +104,7 @@ def main():
     # Parse the arguments and execute the appropriate command
     args = parser.parse_args()
     if args.command == "embed":
-        embed(args.docs_directory, args.vector_db_path)
+        embed(args.docs_paths, args.vector_db_path)
     elif args.command == "query":
         query(args.vector_db_path)
     else:
