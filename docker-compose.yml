@@ -4,5 +4,5 @@ services:
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
     volumes:
-      - ${DOCS_DIRECTORY}:/data/docs
+      - ${DOCS_PATH}:/data/docs
       - ${VECTOR_DB_PATH}:/data/vector_db

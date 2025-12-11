@@ -2,6 +2,7 @@
 
 import logging
 import os
+from typing import Iterable
 
 from langchain_core.embeddings import Embeddings
 from langchain_openai import OpenAIEmbeddings
@@ -25,8 +26,26 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+def _normalize_docs_paths(docs_paths: str | Iterable[str] | None) -> list[str]:
+    """Normalize doc paths from string or iterable into a list."""
+    if docs_paths is None:
+        return []
+
+    if isinstance(docs_paths, str):
+        raw_paths = docs_paths.split(os.pathsep)
+    else:
+        raw_paths = list(docs_paths)
+
+    normalized_paths = [
+        path.strip()
+        for path in raw_paths
+        if path and path.strip()
+    ]
+    return normalized_paths
+
+
 def embed_docs(
-    docs_directory: str = None,
+    docs_paths: str | Iterable[str] = None,
     vector_db_path: str = None,
     embeddings_model: Embeddings = None
 ):
@@ -38,8 +57,9 @@ def embed_docs(
     Deleted files have their chunks removed from the vector store.
 
     Args:
-        docs_directory (str, optional): Directory containing documents to
-            process.
+        docs_paths (str | Iterable[str], optional): One or more document
+            directories. Strings may contain multiple paths separated by
+            ``os.pathsep``.
         vector_db_path (str, optional): Path to save the vector database.
         embeddings_model (Embeddings, optional): Embedding model to use.
 
@@ -48,6 +68,10 @@ def embed_docs(
     """
     if embeddings_model is None:
         embeddings_model = OpenAIEmbeddings()
+
+    normalized_docs_paths = _normalize_docs_paths(docs_paths)
+    if len(normalized_docs_paths) == 0:
+        raise ValueError("Documents path is not set.")
 
     # Initialize file tracker (creates directory if needed)
     file_tracker = FileTracker(vector_db_path)
@@ -60,8 +84,16 @@ def embed_docs(
     )
     logger.info("Vector database path %s", vector_db_path)
 
-    logger.info("Loading documents from %s", docs_directory)
-    files = get_files_from_directory(docs_directory)
+    files: list[str] = []
+    for docs_directory in normalized_docs_paths:
+        if not os.path.isdir(docs_directory):
+            logger.error(
+                "Documents path does not exist or is not a directory: %s",
+                docs_directory
+            )
+            continue
+        logger.info("Loading documents from %s", docs_directory)
+        files.extend(get_files_from_directory(docs_directory))
 
     # Handle deleted files
     deleted_files = file_tracker.get_deleted_files(files)
@@ -126,12 +158,12 @@ def embed_docs(
 
 
 if __name__ == "__main__":
-    _docs_directory = os.getenv("DOCS_DIRECTORY")
-    if _docs_directory is None or not os.path.exists(_docs_directory):
-        raise ValueError("Documents directory is not set.")
+    _docs_paths = _normalize_docs_paths(os.getenv("DOCS_PATH"))
+    if len(_docs_paths) == 0:
+        raise ValueError("Documents path is not set.")
 
     _vector_db_path = os.getenv("VECTOR_DB_PATH")
-    if _vector_db_path is None or not os.path.exists(_vector_db_path):
+    if _vector_db_path is None:
         raise ValueError("Vector database path is not set.")
 
-    embed_docs(docs_directory=_docs_directory, vector_db_path=_vector_db_path)
+    embed_docs(docs_paths=_docs_paths, vector_db_path=_vector_db_path)
