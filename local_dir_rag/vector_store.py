@@ -13,6 +13,41 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+def remove_documents_by_source(vector_db: FAISS, source_path: str) -> int:
+    """
+    Remove all documents from the vector store that match the given source.
+
+    Args:
+        vector_db: The FAISS vector database.
+        source_path: The source file path to match in document metadata.
+
+    Returns:
+        Number of documents removed.
+    """
+    if vector_db is None:
+        return 0
+
+    # Get all document IDs that match the source
+    ids_to_remove = []
+    docstore = vector_db.docstore
+
+    # FAISS uses index_to_docstore_id to map internal indices to doc IDs
+    for doc_id in vector_db.index_to_docstore_id.values():
+        doc = docstore.search(doc_id)
+        if doc and doc.metadata.get("source") == source_path:
+            ids_to_remove.append(doc_id)
+
+    if ids_to_remove:
+        vector_db.delete(ids_to_remove)
+        logger.info(
+            "Removed %d chunks for source %s",
+            len(ids_to_remove),
+            source_path
+        )
+
+    return len(ids_to_remove)
+
+
 def load_vector_database(
     db_path,
     embeddings_model: Embeddings = None
@@ -30,8 +65,10 @@ def load_vector_database(
     if embeddings_model is None:
         embeddings_model = OpenAIEmbeddings()
 
-    if not os.path.exists(db_path):
-        logger.error("Error: Vector database not found at %s", db_path)
+    # Check if the FAISS index file exists (not just the directory)
+    index_file = os.path.join(db_path, "index.faiss")
+    if not os.path.exists(index_file):
+        logger.info("No existing vector database found at %s", db_path)
         return None
 
     try:

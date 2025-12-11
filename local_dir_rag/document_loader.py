@@ -32,11 +32,12 @@ def get_files_from_directory(
 
     all_files = []
     for ext in extensions:
-        files = glob.glob(os.path.join(directory_path, f"*{ext}"))
+        pattern = os.path.join(directory_path, f"**/*{ext}")
+        files = glob.glob(pattern, recursive=True)
         all_files.extend(files)
 
     logger.info(
-        "Found %d %s files in '%s'",
+        "Found %d %s files in '%s' (including subdirectories)",
         len(all_files),
         str(extensions),
         directory_path
