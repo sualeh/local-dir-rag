@@ -91,12 +91,12 @@ class FileTracker:
             cursor = conn.cursor()
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS file_checksums (
-                    file_path TEXT PRIMARY KEY,
                     directory_path TEXT NOT NULL,
                     file_name TEXT NOT NULL,
                     checksum TEXT NOT NULL,
                     file_size INTEGER,
-                    indexed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    indexed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    PRIMARY KEY (directory_path, file_name)
                 )
             """)
             conn.commit()
@@ -115,12 +115,16 @@ class FileTracker:
             FileStatus indicating if the file is new or modified.
         """
         current_checksum = compute_file_checksum(file_path)
+        directory_path, file_name = os.path.split(file_path)
         conn = sqlite3.connect(self.db_path)
         try:
             cursor = conn.cursor()
             cursor.execute(
-                "SELECT checksum FROM file_checksums WHERE file_path = ?",
-                (file_path,)
+                """
+                SELECT checksum FROM file_checksums
+                WHERE directory_path = ? AND file_name = ?
+                """,
+                (directory_path, file_name)
             )
             row = cursor.fetchone()
         finally:
@@ -159,10 +163,9 @@ class FileTracker:
             cursor = conn.cursor()
             cursor.execute("""
                 INSERT OR REPLACE INTO file_checksums
-                    (file_path, directory_path, file_name, checksum, file_size)
-                VALUES (?, ?, ?, ?, ?)
+                    (directory_path, file_name, checksum, file_size)
+                VALUES (?, ?, ?, ?)
             """, (
-                file_path,
                 directory_path,
                 file_name,
                 checksum,
@@ -181,12 +184,16 @@ class FileTracker:
         Args:
             file_path: Absolute path to the file.
         """
+        directory_path, file_name = os.path.split(file_path)
         conn = sqlite3.connect(self.db_path)
         try:
             cursor = conn.cursor()
             cursor.execute(
-                "DELETE FROM file_checksums WHERE file_path = ?",
-                (file_path,)
+                """
+                DELETE FROM file_checksums
+                WHERE directory_path = ? AND file_name = ?
+                """,
+                (directory_path, file_name)
             )
             conn.commit()
         finally:
@@ -204,9 +211,11 @@ class FileTracker:
         conn = sqlite3.connect(self.db_path)
         try:
             cursor = conn.cursor()
-            cursor.execute("SELECT file_path FROM file_checksums")
+            cursor.execute(
+                "SELECT directory_path, file_name FROM file_checksums"
+            )
             rows = cursor.fetchall()
-            return [row[0] for row in rows]
+            return [os.path.join(row[0], row[1]) for row in rows]
         finally:
             conn.close()
 

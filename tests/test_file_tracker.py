@@ -57,7 +57,6 @@ def test_file_tracker_init(temp_dir):
         # Verify columns exist
         cursor.execute("PRAGMA table_info(file_checksums)")
         columns = {row[1] for row in cursor.fetchall()}
-        assert "file_path" in columns
         assert "directory_path" in columns
         assert "file_name" in columns
         assert "checksum" in columns
@@ -172,19 +171,18 @@ def test_file_name_and_directory_stored_separately(temp_dir):
     try:
         cursor = conn.cursor()
         cursor.execute(
-            "SELECT file_path, directory_path, file_name, file_size "
-            "FROM file_checksums WHERE file_path = ?",
-            (file_path,)
+            "SELECT directory_path, file_name, file_size "
+            "FROM file_checksums WHERE directory_path = ? AND file_name = ?",
+            (subdir, "test_file.txt")
         )
         row = cursor.fetchone()
     finally:
         conn.close()
 
     assert row is not None
-    assert row[0] == file_path
-    assert row[1] == subdir
-    assert row[2] == "test_file.txt"
-    assert row[3] == os.path.getsize(file_path)
+    assert row[0] == subdir
+    assert row[1] == "test_file.txt"
+    assert row[2] == os.path.getsize(file_path)
 
 
 def test_file_size_updates_on_change(temp_dir):
@@ -202,8 +200,11 @@ def test_file_size_updates_on_change(temp_dir):
     try:
         cursor = conn.cursor()
         cursor.execute(
-            "SELECT file_size FROM file_checksums WHERE file_path = ?",
-            (file_path,)
+            """
+            SELECT file_size FROM file_checksums
+            WHERE directory_path = ? AND file_name = ?
+            """,
+            (temp_dir, "sized_file.txt")
         )
         initial_size = cursor.fetchone()[0]
     finally:
@@ -220,8 +221,11 @@ def test_file_size_updates_on_change(temp_dir):
     try:
         cursor = conn.cursor()
         cursor.execute(
-            "SELECT file_size FROM file_checksums WHERE file_path = ?",
-            (file_path,)
+            """
+            SELECT file_size FROM file_checksums
+            WHERE directory_path = ? AND file_name = ?
+            """,
+            (temp_dir, "sized_file.txt")
         )
         updated_size = cursor.fetchone()[0]
     finally:
