@@ -86,7 +86,8 @@ class FileTracker:
 
     def _init_database(self) -> None:
         """Initialize the SQLite database with the required schema."""
-        with sqlite3.connect(self.db_path) as conn:
+        conn = sqlite3.connect(self.db_path)
+        try:
             cursor = conn.cursor()
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS file_checksums (
@@ -94,10 +95,13 @@ class FileTracker:
                     directory_path TEXT NOT NULL,
                     file_name TEXT NOT NULL,
                     checksum TEXT NOT NULL,
+                    file_size INTEGER,
                     indexed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
             conn.commit()
+        finally:
+            conn.close()
         logger.info("File tracker database initialized at %s", self.db_path)
 
     def get_file_status(self, file_path: str) -> FileStatus:
@@ -111,14 +115,16 @@ class FileTracker:
             FileStatus indicating if the file is new or modified.
         """
         current_checksum = compute_file_checksum(file_path)
-
-        with sqlite3.connect(self.db_path) as conn:
+        conn = sqlite3.connect(self.db_path)
+        try:
             cursor = conn.cursor()
             cursor.execute(
                 "SELECT checksum FROM file_checksums WHERE file_path = ?",
                 (file_path,)
             )
             row = cursor.fetchone()
+        finally:
+            conn.close()
 
         if row is None:
             return FileStatus(
@@ -147,15 +153,24 @@ class FileTracker:
         """
         checksum = compute_file_checksum(file_path)
         directory_path, file_name = os.path.split(file_path)
-
-        with sqlite3.connect(self.db_path) as conn:
+        file_size = os.path.getsize(file_path)
+        conn = sqlite3.connect(self.db_path)
+        try:
             cursor = conn.cursor()
             cursor.execute("""
                 INSERT OR REPLACE INTO file_checksums
-                    (file_path, directory_path, file_name, checksum)
-                VALUES (?, ?, ?, ?)
-            """, (file_path, directory_path, file_name, checksum))
+                    (file_path, directory_path, file_name, checksum, file_size)
+                VALUES (?, ?, ?, ?, ?)
+            """, (
+                file_path,
+                directory_path,
+                file_name,
+                checksum,
+                file_size
+            ))
             conn.commit()
+        finally:
+            conn.close()
 
         logger.info("Updated checksum for %s", file_path)
 
@@ -166,13 +181,16 @@ class FileTracker:
         Args:
             file_path: Absolute path to the file.
         """
-        with sqlite3.connect(self.db_path) as conn:
+        conn = sqlite3.connect(self.db_path)
+        try:
             cursor = conn.cursor()
             cursor.execute(
                 "DELETE FROM file_checksums WHERE file_path = ?",
                 (file_path,)
             )
             conn.commit()
+        finally:
+            conn.close()
 
         logger.info("Removed %s from tracker", file_path)
 
@@ -183,12 +201,14 @@ class FileTracker:
         Returns:
             List of file paths.
         """
-        with sqlite3.connect(self.db_path) as conn:
+        conn = sqlite3.connect(self.db_path)
+        try:
             cursor = conn.cursor()
             cursor.execute("SELECT file_path FROM file_checksums")
             rows = cursor.fetchall()
-
-        return [row[0] for row in rows]
+            return [row[0] for row in rows]
+        finally:
+            conn.close()
 
     def get_deleted_files(self, current_files: list[str]) -> list[str]:
         """

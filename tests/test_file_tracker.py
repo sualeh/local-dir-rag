@@ -45,7 +45,8 @@ def test_file_tracker_init(temp_dir):
     assert tracker.db_path == os.path.join(vector_db_path, "file_tracker.db")
 
     # Table should exist with correct columns
-    with sqlite3.connect(tracker.db_path) as conn:
+    conn = sqlite3.connect(tracker.db_path)
+    try:
         cursor = conn.cursor()
         cursor.execute(
             "SELECT name FROM sqlite_master WHERE type='table' "
@@ -60,7 +61,10 @@ def test_file_tracker_init(temp_dir):
         assert "directory_path" in columns
         assert "file_name" in columns
         assert "checksum" in columns
+        assert "file_size" in columns
         assert "indexed_at" in columns
+    finally:
+        conn.close()
 
 
 def test_file_status_new_file(temp_dir):
@@ -164,19 +168,67 @@ def test_file_name_and_directory_stored_separately(temp_dir):
     tracker.update_file_checksum(file_path)
 
     # Verify the database has separate columns
-    with sqlite3.connect(tracker.db_path) as conn:
+    conn = sqlite3.connect(tracker.db_path)
+    try:
         cursor = conn.cursor()
         cursor.execute(
-            "SELECT file_path, directory_path, file_name "
+            "SELECT file_path, directory_path, file_name, file_size "
             "FROM file_checksums WHERE file_path = ?",
             (file_path,)
         )
         row = cursor.fetchone()
+    finally:
+        conn.close()
 
     assert row is not None
     assert row[0] == file_path
     assert row[1] == subdir
     assert row[2] == "test_file.txt"
+    assert row[3] == os.path.getsize(file_path)
+
+
+def test_file_size_updates_on_change(temp_dir):
+    """Test that file_size is stored and updated when content changes."""
+    vector_db_path = os.path.join(temp_dir, "vector_db")
+    tracker = FileTracker(vector_db_path)
+
+    file_path = os.path.join(temp_dir, "sized_file.txt")
+    with open(file_path, "w", encoding="utf-8") as f:
+        f.write("size one")
+
+    tracker.update_file_checksum(file_path)
+
+    conn = sqlite3.connect(tracker.db_path)
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT file_size FROM file_checksums WHERE file_path = ?",
+            (file_path,)
+        )
+        initial_size = cursor.fetchone()[0]
+    finally:
+        conn.close()
+
+    assert initial_size == os.path.getsize(file_path)
+
+    with open(file_path, "w", encoding="utf-8") as f:
+        f.write("size two is longer")
+
+    tracker.update_file_checksum(file_path)
+
+    conn = sqlite3.connect(tracker.db_path)
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT file_size FROM file_checksums WHERE file_path = ?",
+            (file_path,)
+        )
+        updated_size = cursor.fetchone()[0]
+    finally:
+        conn.close()
+
+    assert updated_size == os.path.getsize(file_path)
+    assert updated_size != initial_size
 
 
 def test_remove_file(temp_dir):
