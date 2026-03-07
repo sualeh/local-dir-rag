@@ -16,7 +16,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def query_loop(vector_db_path=None, k: int = 10):
+def query_loop(vector_db_path=None, k: int = 30):
     """
     Run an interactive RAG-based chat session using a local vector database
     and OpenAI's ChatGPT model.
@@ -28,8 +28,8 @@ def query_loop(vector_db_path=None, k: int = 10):
 
     # Set up the chat model
     chat_model = ChatOpenAI(
-        model_name="gpt-4o",
-        temperature=0.7
+        model="gpt-5.4",
+        temperature=0.3
     )
 
     # Create the RAG prompt template
