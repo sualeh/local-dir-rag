@@ -22,7 +22,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "pytest ==9.0.2",
+    "pytest ==9.0.3",
     "pytest-cov ==7.0.0",
     "pycobertura ==4.1.0",
     "black ==25.12.0",
