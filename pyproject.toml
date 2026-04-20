@@ -16,7 +16,7 @@ dependencies = [
     "langchain-community ==0.4.1",
     "langchain-openai ==1.1.12",
     "faiss-cpu ==1.13.2",
-    "pypdf ==6.10.1",
+    "pypdf ==6.10.2",
     "sentence-transformers ==5.4.0"
 ]
 
