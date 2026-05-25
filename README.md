@@ -67,6 +67,11 @@ Create an ".env" file in the project root based on ".env.example". Update it wit
     poetry run python -m local_dir_rag.main query --vector-db-path /path/to/vector_db
     ```
 
+    Querying is retrieval-only: the command loads an existing FAISS index,
+    embeds each incoming prompt at query time for similarity lookup, and
+    returns raw matching chunks with file metadata. Indexing is done only by
+    the `embed` command.
+
 
 ## Development and Testing
 

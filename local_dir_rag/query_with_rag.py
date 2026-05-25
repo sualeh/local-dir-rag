@@ -1,13 +1,13 @@
-"""Query with RAG using a local vector database and OpenAI's ChatGPT model."""
+"""Query a local FAISS vector database and return raw matched chunks."""
 import os
+import json
 import logging
+from typing import Any
+
 from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnablePassthrough
-from langchain_core.output_parsers import StrOutputParser
+from langchain_core.documents import Document
+
 from local_dir_rag.vector_store import load_vector_database
-from local_dir_rag.text_processor import format_documents, print_sources
 
 logging.basicConfig(
     level=logging.INFO,
@@ -16,52 +16,78 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+def _sanitize_metadata(metadata: dict[str, Any]) -> dict[str, Any]:
+    """Remove noisy metadata fields and shorten source file path."""
+    clean_metadata = dict(metadata)
+    clean_metadata.pop("producer", None)
+    clean_metadata.pop("creator", None)
+    clean_metadata.pop("creationdate", None)
+    clean_metadata.pop("moddate", None)
+    clean_metadata.pop("total_pages", None)
+    if "source" in clean_metadata:
+        clean_metadata["source"] = os.path.split(clean_metadata["source"])[1]
+    return clean_metadata
+
+
+def _embed_query(vector_db, query: str) -> list[float]:
+    """Embed query text for vector similarity lookup."""
+    embeddings_model = getattr(vector_db, "embeddings", None)
+    if embeddings_model is not None and hasattr(embeddings_model, "embed_query"):
+        return embeddings_model.embed_query(query)
+
+    embedding_function = getattr(vector_db, "embedding_function", None)
+    if embedding_function is not None:
+        if hasattr(embedding_function, "embed_query"):
+            return embedding_function.embed_query(query)
+        if callable(embedding_function):
+            return embedding_function(query)
+
+    raise ValueError("Vector database does not provide query embeddings.")
+
+
+def retrieve_raw_matches(
+    query: str,
+    vector_db,
+    k: int = 30
+) -> list[dict[str, Any]]:
+    """Retrieve raw document chunks and metadata for a query."""
+    query_embedding = _embed_query(vector_db, query)
+    documents: list[Document] = vector_db.similarity_search_by_vector(
+        query_embedding,
+        k=k
+    )
+
+    return [
+        {
+            "content": doc.page_content,
+            "metadata": _sanitize_metadata(doc.metadata),
+        }
+        for doc in documents
+    ]
+
+
+def query_vector_db(
+    query: str,
+    vector_db_path: str,
+    k: int = 30
+) -> list[dict[str, Any]]:
+    """Load an existing vector database and return raw retrieval matches."""
+    vector_db = load_vector_database(vector_db_path)
+    if vector_db is None:
+        raise ValueError(f"No vector database found at {vector_db_path}.")
+    return retrieve_raw_matches(query=query, vector_db=vector_db, k=k)
+
+
 def query_loop(vector_db_path=None, k: int = 30):
     """
-    Run an interactive RAG-based chat session using a local vector database
-    and OpenAI's ChatGPT model.
+    Run an interactive retrieval session using a local vector database.
     """
-
-    # Load the vector database
     vector_db = load_vector_database(vector_db_path)
+    if vector_db is None:
+        raise ValueError(f"No vector database found at {vector_db_path}.")
     logger.info("Vector database loaded successfully from %s", vector_db_path)
 
-    # Set up the chat model
-    chat_model = ChatOpenAI(
-        model="gpt-5.4",
-        temperature=0.3
-    )
-
-    # Create the RAG prompt template
-    prompt_template = ChatPromptTemplate.from_template("""
-    You are a helpful assistant that provides accurate information based on
-    the given context. If you don't know the answer based on the context,
-    just say that you don't know. Don't try to make up an answer.
-
-    Context:
-    {context}
-
-    Question: {question}
-
-    Answer:
-    """)
-
-    # Create a retriever from the vector database
-    retriever = vector_db.as_retriever(search_kwargs={"k": k})
-
-    # Create the RAG chain
-    rag_chain = (
-        {
-            "context": retriever | print_sources | format_documents,
-            "question": RunnablePassthrough()
-        }
-        | prompt_template
-        | chat_model
-        | StrOutputParser()
-    )
-
-    # Interactive query loop
-    print("Local RAG Chat Session")
+    print("Local RAG Retrieval Session")
     print("Type your questions below.")
     print("Type 'exit' or 'quit' to end the session.")
 
@@ -73,9 +99,9 @@ def query_loop(vector_db_path=None, k: int = 30):
             print("Exiting chat session.")
             break
 
-        # Generate answer
-        prompt = rag_chain.invoke(prompt)
-        print(f"\nResponse: {prompt}")
+        matches = retrieve_raw_matches(query=prompt, vector_db=vector_db, k=k)
+        print("\nResponse:")
+        print(json.dumps(matches, indent=2))
 
 
 if __name__ == "__main__":
